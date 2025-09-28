@@ -73,8 +73,11 @@ function mat4RotateY(matrix, angle) {
 function multiplyMat4(a, b) {
     let r = new Float32Array(16);
     for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
-        r[i * 4 + j] = 0;
-        for (let k = 0; k < 4; k++) r[i * 4 + j] += a[i * 4 + k] * b[k * 4 + j];
+        let sum = 0;
+        for (let k = 0; k < 4; k++) {
+            sum += a[k * 4 + i] * b[j * 4 + k]; 
+        }
+        r[j * 4 + i] = sum;
     }
     return r;
 }

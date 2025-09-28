@@ -57,11 +57,12 @@ in vec3 aColor;
 uniform float uTime; //time in sec
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform mat4 uModelTransformationMatrix;
 
 out vec3 vColor;
 
 void main() {
-  gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition,1.0);
+  gl_Position = uProjectionMatrix * uModelViewMatrix * uModelTransformationMatrix * vec4(aPosition,1.0);
   vColor = aColor;
 }
 </script>
@@ -114,7 +115,7 @@ void main() {
     vertEditor.value = document.getElementById("vertex-shader").textContent;
     fragEditor.value = document.getElementById("fragment-shader").textContent;
 
-    let program, posLoc, colorLoc, uMV, uP;
+    let program, posLoc, colorLoc, uMVM, uPM, uMTM;
     let vbo, nbo, ibo;
 
     // Buffers
@@ -139,8 +140,9 @@ void main() {
         posLoc = gl.getAttribLocation(program, "aPosition");
         colorLoc = gl.getAttribLocation(program, "aColor");
         timeLoc = gl.getUniformLocation(program, "uTime");
-        uMV = gl.getUniformLocation(program, "uModelViewMatrix");
-        uP = gl.getUniformLocation(program, "uProjectionMatrix");
+        uMVM = gl.getUniformLocation(program, "uModelViewMatrix");
+        uPM = gl.getUniformLocation(program, "uProjectionMatrix");
+        uMTM = gl.getUniformLocation(program, "uModelTransformationMatrix");
       } catch (e) { console.error(e); }
     }
     initShaderProgram();
@@ -197,13 +199,21 @@ void main() {
 
       // init model-view matrix as identity matrix
       let modelViewMatrix = mat4Identity();
+      // init model transformation matrix as identity matrix
+      let modelTransformationMatrix = mat4Identity();
+
+      //delta time in ms
+      let deltaTime = Date.now() - startTime;
+      // object rotation
+      modelTransformationMatrix = multiplyMat4(modelTransformationMatrix, cubeRotation);
       // camera translation
       modelViewMatrix = mat4Translate(modelViewMatrix, [camX, camY, camZ]);
-      // object rotation
-      modelViewMatrix = multiplyMat4(cubeRotation, modelViewMatrix);
-
-      gl.uniformMatrix4fv(uP, false, proj);
-      gl.uniformMatrix4fv(uMV, false, modelViewMatrix);
+      
+      //set time in seconds
+      gl.uniform1f(timeLoc, deltaTime/1000.0);
+      gl.uniformMatrix4fv(uPM, false, proj);
+      gl.uniformMatrix4fv(uMVM, false, modelViewMatrix);
+      gl.uniformMatrix4fv(uMTM, false, modelTransformationMatrix);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
       gl.enableVertexAttribArray(posLoc);
@@ -213,11 +223,6 @@ void main() {
       gl.enableVertexAttribArray(colorLoc);
       gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-
-      //delta time in ms
-      let deltaTime = Date.now() - startTime;
-      //set time in seconds
-      gl.uniform1f(timeLoc, deltaTime/1000.0);
 
       // draw the object by the index order
       gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
