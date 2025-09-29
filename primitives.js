@@ -1,5 +1,5 @@
 // cube
-const positions = new Float32Array([
+const cubePositions = new Float32Array([
   -1, -1, -1,  // 0
    1, -1, -1,  // 1
    1,  1, -1,  // 2
@@ -10,12 +10,12 @@ const positions = new Float32Array([
   -1,  1,  1   // 7
 ]);
 
-const colors = new Float32Array([
+const cubeColors = new Float32Array([
   1,0,0,  0,1,0,  0,0,1, 1,1,0, 1,0,1, 0,1,1, 1,1,0, 1,0,1
 ]);
 
 
-const indices = new Uint16Array([
+const cubeIndices = new Uint16Array([
   // Front
   4, 5, 6,   4, 6, 7,
   // Back
@@ -28,4 +28,25 @@ const indices = new Uint16Array([
   1, 2, 6,   1, 6, 5,
   // Left
   0, 4, 7,   0, 7, 3,
+]);
+
+const tetrahedronPositions = new Float32Array([
+  1, 1, 1,    // Vertex 0
+ -1, -1, 1,   // Vertex 1
+ -1, 1, -1,   // Vertex 2
+ 1, -1, -1    // Vertex 3
+]);
+
+const tetrahedronColors = new Float32Array([
+  1, 0, 0,
+  0, 1, 0,
+  0, 0, 1,
+  1, 1, 0
+]);
+
+const tetrahedronIndices = new Uint16Array([
+  0, 1, 2,
+  0, 3, 1,
+  0, 2, 3,
+  1, 3, 2
 ]);

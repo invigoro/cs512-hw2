@@ -119,19 +119,51 @@ void main() {
     let vbo, nbo, ibo;
 
     // Buffers
-    function initBuffers() {
+    function initCubeBuffers() {
       vbo = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+      gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW);
 
       nbo = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
-      gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+      gl.bufferData(gl.ARRAY_BUFFER, cubeColors, gl.STATIC_DRAW);
 
       ibo = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, cubeIndices, gl.STATIC_DRAW);
+    }
+    function initTetrahedronBuffers() {
+      tetvbo = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, tetvbo);
+      gl.bufferData(gl.ARRAY_BUFFER, tetrahedronPositions, gl.STATIC_DRAW);
+      
+      tetnbo = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, tetnbo);
+      gl.bufferData(gl.ARRAY_BUFFER, tetrahedronColors, gl.STATIC_DRAW);
+
+      tetibo = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tetibo); 
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, tetrahedronIndices, gl.STATIC_DRAW);
+    }
+
+    function initBuffer(positions, colors, indices) {
+      let vbo = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+      gl.bufferData(gl.ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+      let nbo = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
+      gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+
+      let ibo = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
     }
-    initBuffers();
+
+    
+    function initAllBuffers() {
+      initCubeBuffers();
+      initTetrahedronBuffers();
+    }
+    initAllBuffers();
 
     function initShaderProgram() {
       try {
@@ -225,7 +257,7 @@ void main() {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
 
       // draw the object by the index order
-      gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+      gl.drawElements(gl.TRIANGLES, cubeIndices.length, gl.UNSIGNED_SHORT, 0);
     }
 
     // Initialize when page loads
