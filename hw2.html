@@ -129,36 +129,8 @@ void main() {
     fragEditor.value = document.getElementById("fragment-shader").textContent;
 
     let program, posLoc, colorLoc, uMVM, uPM, uMTM;
-    // let vbo, nbo, ibo;
     let tetvbo, tetnbo, tetibo;
     let buffers = [];
-
-    // // Buffers
-    // function initCubeBuffers() {
-    //   vbo = gl.createBuffer();
-    //   gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-    //   gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW);
-
-    //   nbo = gl.createBuffer();
-    //   gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
-    //   gl.bufferData(gl.ARRAY_BUFFER, cubeColors, gl.STATIC_DRAW);
-
-    //   ibo = gl.createBuffer();
-    //   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, cubeIndices, gl.STATIC_DRAW);
-    // }
-    // function initTetrahedronBuffers() {
-    //   tetvbo = gl.createBuffer();
-    //   gl.bindBuffer(gl.ARRAY_BUFFER, tetvbo);
-    //   gl.bufferData(gl.ARRAY_BUFFER, tetrahedronPositions, gl.STATIC_DRAW);
-
-    //   tetnbo = gl.createBuffer();
-    //   gl.bindBuffer(gl.ARRAY_BUFFER, tetnbo);
-    //   gl.bufferData(gl.ARRAY_BUFFER, tetrahedronColors, gl.STATIC_DRAW);
-
-    //   tetibo = gl.createBuffer();
-    //   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tetibo);
-    //   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, tetrahedronIndices, gl.STATIC_DRAW);
-    // }
 
     function initBuffer(positions, colors, indices) {
       let bvbo = gl.createBuffer();
@@ -177,8 +149,6 @@ void main() {
 
 
     function initAllBuffers() {
-      //initCubeBuffers();
-      //initTetrahedronBuffers();
       buffers = [];
       //initBuffer(cubePositions, cubeColors, cubeIndices);
       //initBuffer(tetrahedronPositions, tetrahedronColors, tetrahedronIndices);
@@ -279,29 +249,6 @@ void main() {
 
       for (i = 0; i < buffers.length; i++) {
         let b = buffers[i];
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-        // gl.enableVertexAttribArray(posLoc);
-        // gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
-        // gl.enableVertexAttribArray(colorLoc);
-        // gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
-        // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-
-        // // draw the object by the index order
-        // gl.drawElements(gl.TRIANGLES, cubeIndices.length, gl.UNSIGNED_SHORT, 0);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, tetvbo);
-        // gl.enableVertexAttribArray(posLoc);
-        // gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
-
-        // gl.bindBuffer(gl.ARRAY_BUFFER, tetnbo);
-        // gl.enableVertexAttribArray(colorLoc);
-        // gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
-        // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tetibo);
-        // // draw the object by the index order
-        // gl.drawElements(gl.TRIANGLES, tetrahedronIndices.length, gl.UNSIGNED_SHORT, 0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
         gl.enableVertexAttribArray(posLoc);
