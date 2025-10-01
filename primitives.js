@@ -1,3 +1,4 @@
+
 //for storing buffer objs
 class buff {
   constructor(bvbo, bnbo, bibo, len) {
@@ -87,10 +88,14 @@ function interpolateColors(length = 1, minBrightness = 0.1, color1 = null, color
   }
   return new Float32Array(colors);
 }
+//Scale by factor
+function scale(array, factor = 1) {
+    return array.map(x => x * factor);
+}
 
 function createCube(radius = 1) {
   return {
-    positions: cubePositions.map(x => x * radius),
+    positions: scale(cubePositions, radius),
     colors: interpolateColors(cubePositions.length),
     indices: cubeIndices,
   };
@@ -98,7 +103,7 @@ function createCube(radius = 1) {
 
 function createTetrahedron(radius = 1) {
   return {
-    positions: tetrahedronPositions.map(x => x * radius),
+    positions: scale(tetrahedronPositions, radius),
     colors: interpolateColors(tetrahedronPositions.length),
     indices: tetrahedronIndices,
   };
