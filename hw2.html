@@ -28,10 +28,10 @@
 <body>
   <h2>Interactive Controls & Geometric Primitives</h2>
   <p>Edit vertex and fragment shaders on the left to get the result instantly.<br>
-  Use mouse to drag and rotate the cube. <br>
-Use arrow keys and w, s keys to move the camera.<br>
-Save your code to source file if you want to save it.<br>
-Press F12 to see the console for debugging.</p>
+    Use mouse to drag and rotate the cube. <br>
+    Use arrow keys and w, s keys to move the camera.<br>
+    Save your code to source file if you want to save it.<br>
+    Press F12 to see the console for debugging.</p>
 
   <div style="display: flex; gap: 10px; align-items: flex-start;">
     <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -50,13 +50,14 @@ Press F12 to see the console for debugging.</p>
     <div>
       <div><label for="primitive">Choose a shape:</label>
 
-<select name="primitive" id="primitive">
-  <option value="Cube">Cube</option>
-  <option value="Tetrahedron">Tetrahedron</option>
-  <option value="Cylinder">Cylinder</option>
-  <option value="Sphere">Sphere</option>
-</select></div>
-      
+        <select name="primitive" id="primitive">
+          <option value="Cube">Cube</option>
+          <option value="Tetrahedron">Tetrahedron</option>
+          <option value="Cylinder">Cylinder</option>
+          <option value="Sphere">Sphere</option>
+        </select>
+      </div>
+
       <button id="primitive-insert">Add To Scene</button>
     </div>
   </div>
@@ -128,53 +129,68 @@ void main() {
     fragEditor.value = document.getElementById("fragment-shader").textContent;
 
     let program, posLoc, colorLoc, uMVM, uPM, uMTM;
-    let vbo, nbo, ibo;
+    // let vbo, nbo, ibo;
     let tetvbo, tetnbo, tetibo;
+    let buffers = [];
 
-    // Buffers
-    function initCubeBuffers() {
-      vbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-      gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW);
+    // // Buffers
+    // function initCubeBuffers() {
+    //   vbo = gl.createBuffer();
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    //   gl.bufferData(gl.ARRAY_BUFFER, cubePositions, gl.STATIC_DRAW);
 
-      nbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
-      gl.bufferData(gl.ARRAY_BUFFER, cubeColors, gl.STATIC_DRAW);
+    //   nbo = gl.createBuffer();
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
+    //   gl.bufferData(gl.ARRAY_BUFFER, cubeColors, gl.STATIC_DRAW);
 
-      ibo = gl.createBuffer();
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, cubeIndices, gl.STATIC_DRAW);
-    }
-    function initTetrahedronBuffers() {
-      tetvbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, tetvbo);
-      gl.bufferData(gl.ARRAY_BUFFER, tetrahedronPositions, gl.STATIC_DRAW);
-      
-      tetnbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, tetnbo);
-      gl.bufferData(gl.ARRAY_BUFFER, tetrahedronColors, gl.STATIC_DRAW);
+    //   ibo = gl.createBuffer();
+    //   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, cubeIndices, gl.STATIC_DRAW);
+    // }
+    // function initTetrahedronBuffers() {
+    //   tetvbo = gl.createBuffer();
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, tetvbo);
+    //   gl.bufferData(gl.ARRAY_BUFFER, tetrahedronPositions, gl.STATIC_DRAW);
 
-      tetibo = gl.createBuffer();
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tetibo); 
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, tetrahedronIndices, gl.STATIC_DRAW);
-    }
+    //   tetnbo = gl.createBuffer();
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, tetnbo);
+    //   gl.bufferData(gl.ARRAY_BUFFER, tetrahedronColors, gl.STATIC_DRAW);
+
+    //   tetibo = gl.createBuffer();
+    //   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tetibo);
+    //   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, tetrahedronIndices, gl.STATIC_DRAW);
+    // }
 
     function initBuffer(positions, colors, indices) {
-      let vbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-      gl.bufferData(gl.ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+      let bvbo = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, bvbo);
+      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 
-      let nbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
+      let bnbo = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, bnbo);
       gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
 
-      let ibo = gl.createBuffer();
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+      let bibo = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bibo);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+      buffers.push(new buff(bvbo, bnbo, bibo, indices.length));
     }
 
-    
+
     function initAllBuffers() {
-      initCubeBuffers();
-      initTetrahedronBuffers();
+      //initCubeBuffers();
+      //initTetrahedronBuffers();
+      buffers = [];
+      //initBuffer(cubePositions, cubeColors, cubeIndices);
+      //initBuffer(tetrahedronPositions, tetrahedronColors, tetrahedronIndices);
+      //let cylinder = createCylinder();
+      //initBuffer(cylinder.positions, cylinder.colors, cylinder.indices);
+      // let sphere = createSphere();
+      // initBuffer(sphere.positions, sphere.colors, sphere.indices);
+      // let cone = createCone();
+      // initBuffer(cone.positions, cone.colors, cone.indices);
+      let torus = createTorus();
+      initBuffer(torus.positions, torus.colors, torus.indices);
+      console.log(buffers);
     }
     initAllBuffers();
 
@@ -231,6 +247,7 @@ void main() {
     let startTime = Date.now();
 
     function render() {
+
       gl.enable(gl.DEPTH_TEST);
       gl.clearColor(0, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -253,35 +270,52 @@ void main() {
       modelTransformationMatrix = multiplyMat4(modelTransformationMatrix, cubeRotation);
       // camera translation
       modelViewMatrix = mat4Translate(modelViewMatrix, [camX, camY, camZ]);
-      
+
       //set time in seconds
-      gl.uniform1f(timeLoc, deltaTime/1000.0);
+      gl.uniform1f(timeLoc, deltaTime / 1000.0);
       gl.uniformMatrix4fv(uPM, false, proj);
       gl.uniformMatrix4fv(uMVM, false, modelViewMatrix);
       gl.uniformMatrix4fv(uMTM, false, modelTransformationMatrix);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+      for (i = 0; i < buffers.length; i++) {
+        let b = buffers[i];
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
-      gl.enableVertexAttribArray(colorLoc);
-      gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        // gl.enableVertexAttribArray(posLoc);
+        // gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-      // draw the object by the index order
-      gl.drawElements(gl.TRIANGLES, cubeIndices.length, gl.UNSIGNED_SHORT, 0);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, nbo);
+        // gl.enableVertexAttribArray(colorLoc);
+        // gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+        // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, tetvbo);
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+        // // draw the object by the index order
+        // gl.drawElements(gl.TRIANGLES, cubeIndices.length, gl.UNSIGNED_SHORT, 0);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, tetnbo);
-      gl.enableVertexAttribArray(colorLoc);
-      gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tetibo);
-      // draw the object by the index order
-      gl.drawElements(gl.TRIANGLES, tetrahedronIndices.length, gl.UNSIGNED_SHORT, 0);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, tetvbo);
+        // gl.enableVertexAttribArray(posLoc);
+        // gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+
+        // gl.bindBuffer(gl.ARRAY_BUFFER, tetnbo);
+        // gl.enableVertexAttribArray(colorLoc);
+        // gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+        // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tetibo);
+        // // draw the object by the index order
+        // gl.drawElements(gl.TRIANGLES, tetrahedronIndices.length, gl.UNSIGNED_SHORT, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
+        gl.enableVertexAttribArray(colorLoc);
+        gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+
+        // draw the object by the index order
+        gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+      }
     }
 
     // Initialize when page loads
