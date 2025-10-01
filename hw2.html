@@ -129,6 +129,7 @@ void main() {
 
     let program, posLoc, colorLoc, uMVM, uPM, uMTM;
     let vbo, nbo, ibo;
+    let tetvbo, tetnbo, tetibo;
 
     // Buffers
     function initCubeBuffers() {
@@ -270,6 +271,17 @@ void main() {
 
       // draw the object by the index order
       gl.drawElements(gl.TRIANGLES, cubeIndices.length, gl.UNSIGNED_SHORT, 0);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, tetvbo);
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, tetnbo);
+      gl.enableVertexAttribArray(colorLoc);
+      gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, tetibo);
+      // draw the object by the index order
+      gl.drawElements(gl.TRIANGLES, tetrahedronIndices.length, gl.UNSIGNED_SHORT, 0);
     }
 
     // Initialize when page loads
