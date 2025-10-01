@@ -1,3 +1,17 @@
+//for storing buffer objs
+class buff {
+  constructor(bvbo, bnbo, bibo, len) {
+    this.vbo = bvbo;
+    this.nbo = bnbo;
+    this.ibo = bibo;
+    this.length = len;
+  }
+}
+//primitive type
+//storing shape data
+class shape {
+}
+
 // cube
 const cubePositions = new Float32Array([
   -1, -1, -1,  // 0
@@ -38,16 +52,6 @@ const tetrahedronIndices = new Uint16Array([
   0, 2, 3,
   1, 3, 2
 ]);
-
-class buff {
-  constructor(bvbo, bnbo, bibo, len) {
-    this.vbo = bvbo;
-    this.nbo = bnbo;
-    this.ibo = bibo;
-    this.length = len;
-  }
-}
-
 function interpolateColors(length = 1, minBrightness = 0.1, color1 = null, color2 = null) {
   //make this a minimum avg brightness of .5 by default
   let colors = []
