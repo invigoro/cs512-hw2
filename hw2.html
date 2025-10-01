@@ -150,16 +150,18 @@ void main() {
 
     function initAllBuffers() {
       buffers = [];
-      //initBuffer(cubePositions, cubeColors, cubeIndices);
-      //initBuffer(tetrahedronPositions, tetrahedronColors, tetrahedronIndices);
-      //let cylinder = createCylinder();
-      //initBuffer(cylinder.positions, cylinder.colors, cylinder.indices);
+      let cylinder = createCylinder();
+      initBuffer(cylinder.positions, cylinder.colors, cylinder.indices);
+      // let tet = createTetrahedron();
+      // initBuffer(tet.positions, tet.colors, tet.indices);
+      //let cube = createCube();
+      //initBuffer(cube.positions, cube.colors, cube.indices);
       // let sphere = createSphere();
       // initBuffer(sphere.positions, sphere.colors, sphere.indices);
       // let cone = createCone();
       // initBuffer(cone.positions, cone.colors, cone.indices);
-      let torus = createTorus();
-      initBuffer(torus.positions, torus.colors, torus.indices);
+      // let torus = createTorus();
+      // initBuffer(torus.positions, torus.colors, torus.indices);
       console.log(buffers);
     }
     initAllBuffers();
