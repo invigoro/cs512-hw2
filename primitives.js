@@ -16,6 +16,44 @@ class buff {
   rotX = 0;
   rotY = 0;
   rotZ = 0;
+
+
+  getRotationMatrix() {
+    const cx = Math.cos(this.rotY), sx = Math.sin(this.rotY);
+    const cy = Math.cos(this.rotX), sy = Math.sin(this.rotX);
+    const cz = Math.cos(this.rotZ), sz = Math.sin(this.rotZ);
+
+    // Rotation X
+    const rotXMat = [
+      1, 0, 0, 0,
+      0, cy, sy, 0,
+      0, -sy, cy, 0,
+      0, 0, 0, 1
+    ];
+
+    // Rotation Y
+    const rotYMat = [
+      cx, 0, -sx, 0,
+      0, 1, 0, 0,
+      sx, 0, cx, 0,
+      0, 0, 0, 1
+    ];
+
+    // Rotation Z (optional)
+    const rotZMat = [
+      cz, sz, 0, 0,
+      -sz, cz, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1
+    ];
+
+    // Combine Y * X * Z (order matters!)
+    return multiplyMat4(multiplyMat4(rotYMat, rotXMat), rotZMat);
+  }
+  getTranslationMatrix() {
+    return mat4Translate(mat4Identity(), [this.posX, this.posY, this.posZ]);
+  }
+
 }
 function idToColor(id) {
   return [
@@ -109,7 +147,7 @@ function interpolateColors(length = 1, minBrightness = 0.1, color1 = null, color
 }
 //Scale by factor
 function scale(array, factor = 1) {
-    return array.map(x => x * factor);
+  return array.map(x => x * factor);
 }
 
 function createCube(radius = 1) {
@@ -164,19 +202,19 @@ function createCylinder(radius = 1, height = 2, segments = 32) {
     indices.push(p3, p4, p2);
   }
 
-  // Top cap
-  for (let i = 0; i < segments; i++) {
-    let p1 = i * 2;
-    let p2 = ((i + 1) % segments) * 2;
-    indices.push(topCenterIndex, p1, p2);
-  }
+  // Top cap (CCW order for top face)
+for (let i = 0; i < segments; i++) {
+  let p1 = ((i + 1) % segments) * 2;
+  let p2 = i * 2;
+  indices.push(topCenterIndex, p1, p2);
+}
 
-  // Bottom cap
-  for (let i = 0; i < segments; i++) {
-    let p1 = i * 2 + 1;
-    let p2 = ((i + 1) % segments) * 2 + 1;
-    indices.push(bottomCenterIndex, p2, p1);
-  }
+// Bottom cap (CCW order from bottom view)
+for (let i = 0; i < segments; i++) {
+  let p1 = i * 2 + 1;
+  let p2 = ((i + 1) % segments) * 2 + 1;
+  indices.push(bottomCenterIndex, p1, p2);
+}
 
   return {
     positions: new Float32Array(positions),
