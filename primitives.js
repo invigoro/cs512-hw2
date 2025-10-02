@@ -10,6 +10,12 @@ class buff {
     this.pickColor = idToColor(id); //this is just id encoded as a color for the onclick event
     //redudancy makes it so the conversion has to happen less frequently. Not that this is computationally intensive lol
   }
+  posX = 0;
+  posY = 0;
+  posZ = 0;
+  rotX = 0;
+  rotY = 0;
+  rotZ = 0;
 }
 function idToColor(id) {
   return [

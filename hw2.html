@@ -142,6 +142,10 @@ void main() {
     let program, posLoc, colorLoc, uMVM, uPM, uMTM;
     let tetvbo, tetnbo, tetibo;
     let buffers = [];
+    let rotMats = [];
+    let posMats = [];
+    let selectedObject = null;
+    let selectedObjectIndex = null;
     let curId = 0;
     function getNewId() {
       curId++;//makes sure this id is always unique
@@ -162,6 +166,7 @@ void main() {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bibo);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
       buffers.push(new buff(bvbo, bnbo, bibo, indices.length, getNewId()));
+      rotMats.push[null];
     }
 
     function createShape(shapeName = null) {
@@ -223,7 +228,7 @@ void main() {
       uPickColorLoc = gl.getUniformLocation(pickProgram, "uPickColor");
       uPickPM = gl.getUniformLocation(pickProgram, "uProjectionMatrix");
       uPickMVM = gl.getUniformLocation(pickProgram, "uModelViewMatrix");
-      uPickMTM = gl.getUniformLocation(pickProgram, "uModelTransformationMatrix"); // if needed
+      uPickMTM = gl.getUniformLocation(pickProgram, "uModelTransformationMatrix");
     }
     initPickShader();
 
@@ -257,8 +262,8 @@ void main() {
       if (!mouseDown) return;
       let dx = e.clientX - lastX;
       let dy = e.clientY - lastY;
-      cubeRotY += dx * 0.01;
-      cubeRotX += dy * 0.01;
+      selectedObject.rotY += dx * 0.01;
+      selectedObject.rotX += dy * 0.01;
       lastX = e.clientX; lastY = e.clientY;
     });
 
@@ -291,13 +296,13 @@ void main() {
     function pickObjectAt(x, y) {
       let mvMatrix = mat4Translate(mat4Identity(), [camX, camY, camZ]);
       let rotation = multiplyMat4(
-        [Math.cos(cubeRotY), 0, -Math.sin(cubeRotY), 0,
+        [Math.cos(selectedObject.rotY), 0, -Math.sin(selectedObject.rotY), 0,
           0, 1, 0, 0,
-        Math.sin(cubeRotY), 0, Math.cos(cubeRotY), 0,
+        Math.sin(selectedObject.rotY), 0, Math.cos(selectedObject.rotY), 0,
           0, 0, 0, 1],
         [1, 0, 0, 0,
-          0, Math.cos(cubeRotX), Math.sin(cubeRotX), 0,
-          0, -Math.sin(cubeRotX), Math.cos(cubeRotX), 0,
+          0, Math.cos(selectedObject.rotX), Math.sin(selectedObject.rotX), 0,
+          0, -Math.sin(selectedObject.rotX), Math.cos(selectedObject.rotX), 0,
           0, 0, 0, 1]
       );
       let mtMatrix = rotation;
@@ -334,7 +339,6 @@ void main() {
       let pickedId = colorToId(pixels);
       return pickedId;
     }
-    let selectedObject = null;
 
     //mouse interaction for selecting objects
     canvas.addEventListener("click", (e) => {
@@ -343,7 +347,8 @@ void main() {
       const mouseY = e.clientY - rect.top;
       const pickedId = pickObjectAt(mouseX, mouseY);
 
-      selectedObject = buffers.find(obj => obj.id === pickedId) || null;
+      selectedObjectIndex = buffers.findIndex(obj => obj.id === pickedId);
+      selectedObject = buffers[selectedObjectIndex] || null;
       console.log("Picked object:", selectedObject ? selectedObject.id : "none");
     });
 
@@ -355,13 +360,13 @@ void main() {
       gl.enable(gl.DEPTH_TEST);
       gl.clearColor(0, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+////// TODO: refactor this and move it to the for loop, to mess with rotations for each one
       // rotation matrices
-      let cx = Math.cos(cubeRotY), sx = Math.sin(cubeRotY);
-      let cy = Math.cos(cubeRotX), sy = Math.sin(cubeRotX);
+      let cx = Math.cos(selectedObject.rotY), sx = Math.sin(selectedObject.rotY);
+      let cy = Math.cos(selectedObject.rotX), sy = Math.sin(selectedObject.rotX);
       let rotX = [1, 0, 0, 0, 0, cy, sy, 0, 0, -sy, cy, 0, 0, 0, 0, 1];
       let rotY = [cx, 0, -sx, 0, 0, 1, 0, 0, sx, 0, cx, 0, 0, 0, 0, 1];
-      let cubeRotation = multiplyMat4(rotY, rotX);
+      rotMats[selectedObjectIndex] = multiplyMat4(rotY, rotX);
 
       // init model-view matrix as identity matrix
       modelViewMatrix = mat4Identity();
