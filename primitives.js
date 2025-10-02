@@ -205,18 +205,18 @@ function createCylinder(radius = 1, height = 2, segments = 32) {
   }
 
   // Top cap (CCW order for top face)
-for (let i = 0; i < segments; i++) {
-  let p1 = ((i + 1) % segments) * 2;
-  let p2 = i * 2;
-  indices.push(topCenterIndex, p1, p2);
-}
+  for (let i = 0; i < segments; i++) {
+    let p1 = ((i + 1) % segments) * 2;
+    let p2 = i * 2;
+    indices.push(topCenterIndex, p1, p2);
+  }
 
-// Bottom cap (CCW order from bottom view)
-for (let i = 0; i < segments; i++) {
-  let p1 = i * 2 + 1;
-  let p2 = ((i + 1) % segments) * 2 + 1;
-  indices.push(bottomCenterIndex, p1, p2);
-}
+  // Bottom cap (CCW order from bottom view)
+  for (let i = 0; i < segments; i++) {
+    let p1 = i * 2 + 1;
+    let p2 = ((i + 1) % segments) * 2 + 1;
+    indices.push(bottomCenterIndex, p1, p2);
+  }
 
   return {
     positions: new Float32Array(positions),

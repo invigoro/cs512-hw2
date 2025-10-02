@@ -179,12 +179,12 @@ void main() {
     }
 
     function createShape(shapeName = null) {
-      if(shapeName == null) {
+      if (shapeName == null) {
         shapeName = document.getElementById("primitiveName").value;
       }
       let shape = null;
       console.log(shapeName);
-      switch(shapeName) {
+      switch (shapeName) {
         case "Cube": shape = createCube(); break;
         case "Cylinder": shape = createCylinder(); break;
         case "Tetrahedron": shape = createTetrahedron(); break;
@@ -273,15 +273,15 @@ void main() {
       if (!selectedObject) return;
       let dx = e.clientX - lastX;
       let dy = e.clientY - lastY;
-      if(mode == "rotate") {
-      selectedObject.rotY += dx * 0.01;
-      selectedObject.rotX += dy * 0.01;
+      if (mode == "rotate") {
+        selectedObject.rotY += dx * 0.01;
+        selectedObject.rotX += dy * 0.01;
       }
-      else if(mode == "translate") {
-      selectedObject.posY += -dy * 0.01; //invert since y counts from the top
-      selectedObject.posX += dx * 0.01; 
+      else if (mode == "translate") {
+        selectedObject.posY += -dy * 0.01; //invert since y counts from the top
+        selectedObject.posX += dx * 0.01;
       }
-      else if(mode == "scale") {
+      else if (mode == "scale") {
         let scaleDiff = -dy * 0.01;
         selectedObject.scaY += scaleDiff;
         selectedObject.scaX += scaleDiff;
@@ -317,46 +317,46 @@ void main() {
     ]);
 
     function pickObjectAt(x, y) {
-  let mvMatrix = mat4Translate(mat4Identity(), [camX, camY, camZ]);
+      let mvMatrix = mat4Translate(mat4Identity(), [camX, camY, camZ]);
 
-  gl.bindFramebuffer(gl.FRAMEBUFFER, pickFramebuffer);
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.clearColor(0, 0, 0, 1);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, pickFramebuffer);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  gl.useProgram(pickProgram);
-  gl.uniformMatrix4fv(uPickPM, false, proj);
-  gl.uniformMatrix4fv(uPickMVM, false, mvMatrix);
+      gl.useProgram(pickProgram);
+      gl.uniformMatrix4fv(uPickPM, false, proj);
+      gl.uniformMatrix4fv(uPickMVM, false, mvMatrix);
 
-  for (let i = 0; i < buffers.length; i++) {
-    const b = buffers[i];
+      for (let i = 0; i < buffers.length; i++) {
+        const b = buffers[i];
 
-    let cx = Math.cos(b.rotY || 0), sx = Math.sin(b.rotY || 0);
-    let cy = Math.cos(b.rotX || 0), sy = Math.sin(b.rotX || 0);
+        let cx = Math.cos(b.rotY || 0), sx = Math.sin(b.rotY || 0);
+        let cy = Math.cos(b.rotX || 0), sy = Math.sin(b.rotX || 0);
 
-    let rotX = [1, 0, 0, 0, 0, cy, sy, 0, 0, -sy, cy, 0, 0, 0, 0, 1];
-    let rotY = [cx, 0, -sx, 0, 0, 1, 0, 0, sx, 0, cx, 0, 0, 0, 0, 1];
-    let mtMatrix = multiplyMat4(rotY, rotX);
+        let rotX = [1, 0, 0, 0, 0, cy, sy, 0, 0, -sy, cy, 0, 0, 0, 0, 1];
+        let rotY = [cx, 0, -sx, 0, 0, 1, 0, 0, sx, 0, cx, 0, 0, 0, 0, 1];
+        let mtMatrix = multiplyMat4(rotY, rotX);
 
-    gl.uniformMatrix4fv(uPickMTM, false, mtMatrix);
+        gl.uniformMatrix4fv(uPickMTM, false, mtMatrix);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
-    gl.enableVertexAttribArray(posLoc);
-    gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
 
-    gl.uniform3fv(uPickColorLoc, b.pickColor);
-    gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
-  }
+        gl.uniform3fv(uPickColorLoc, b.pickColor);
+        gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+      }
 
-  let pixels = new Uint8Array(4);
-  gl.readPixels(x, canvas.height - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      let pixels = new Uint8Array(4);
+      gl.readPixels(x, canvas.height - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-  let pickedId = colorToId(pixels);
-  return pickedId;
-}
+      let pickedId = colorToId(pixels);
+      return pickedId;
+    }
 
     //mouse interaction for selecting objects
     canvas.addEventListener("click", (e) => {
@@ -373,89 +373,89 @@ void main() {
 
     let startTime = Date.now();
 
-function render() {
-  gl.useProgram(program);
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.clearDepth(1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    function render() {
+      gl.useProgram(program);
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clearDepth(1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Set projection matrix uniform once
-  gl.uniformMatrix4fv(uPM, false, proj);
+      // Set projection matrix uniform once
+      gl.uniformMatrix4fv(uPM, false, proj);
 
-  // Camera transform (modelViewMatrix)
-  let modelViewMatrix = mat4Translate(mat4Identity(), [camX, camY, camZ]);
-  gl.uniformMatrix4fv(uMVM, false, modelViewMatrix);
+      // Camera transform (modelViewMatrix)
+      let modelViewMatrix = mat4Translate(mat4Identity(), [camX, camY, camZ]);
+      gl.uniformMatrix4fv(uMVM, false, modelViewMatrix);
 
-  for (let i = 0; i < buffers.length; i++) {
-    let b = buffers[i];
-    let scaleVector = b.getScaleVector();
-    let rotationMatrix = b.getRotationMatrix();
-    let translationMatrix = b.getTranslationMatrix();
-    let transformMatrix = mat4Scale(mat4Identity(), scaleVector);
-    transformMatrix = multiplyMat4(rotationMatrix, transformMatrix);
-    transformMatrix = multiplyMat4(translationMatrix, transformMatrix);
+      for (let i = 0; i < buffers.length; i++) {
+        let b = buffers[i];
+        let scaleVector = b.getScaleVector();
+        let rotationMatrix = b.getRotationMatrix();
+        let translationMatrix = b.getTranslationMatrix();
+        let transformMatrix = mat4Scale(mat4Identity(), scaleVector);
+        transformMatrix = multiplyMat4(rotationMatrix, transformMatrix);
+        transformMatrix = multiplyMat4(translationMatrix, transformMatrix);
 
-    if (b === selectedObject) {
-      // --- Outline pass ---
-      let outlineScale = 1.05;
-      let outlineTransform = mat4Scale(transformMatrix, [outlineScale, outlineScale, outlineScale]);
+        if (b === selectedObject) {
+          // --- Outline pass ---
+          let outlineScale = 1.05;
+          let outlineTransform = mat4Scale(transformMatrix, [outlineScale, outlineScale, outlineScale]);
 
-      gl.enable(gl.CULL_FACE);
-      gl.cullFace(gl.FRONT);
-      gl.frontFace(gl.CW);
+          gl.enable(gl.CULL_FACE);
+          gl.cullFace(gl.FRONT);
+          gl.frontFace(gl.CW);
 
-      // red color for outline
-      gl.disableVertexAttribArray(colorLoc);
-      gl.vertexAttrib3f(colorLoc, 1.0, 0.0, 0.0);
+          // red color for outline
+          gl.disableVertexAttribArray(colorLoc);
+          gl.vertexAttrib3f(colorLoc, 1.0, 0.0, 0.0);
 
-      gl.uniformMatrix4fv(uMTM, false, outlineTransform);
+          gl.uniformMatrix4fv(uMTM, false, outlineTransform);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+          gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
+          gl.enableVertexAttribArray(posLoc);
+          gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
-      gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+          gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
 
-      // --- Normal object pass ---
-      gl.frontFace(gl.CCW);
-      gl.cullFace(gl.BACK);
-      gl.enableVertexAttribArray(colorLoc);
+          // --- Normal object pass ---
+          gl.frontFace(gl.CCW);
+          gl.cullFace(gl.BACK);
+          gl.enableVertexAttribArray(colorLoc);
 
-      gl.uniformMatrix4fv(uMTM, false, transformMatrix);
+          gl.uniformMatrix4fv(uMTM, false, transformMatrix);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+          gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
+          gl.enableVertexAttribArray(posLoc);
+          gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
-      gl.enableVertexAttribArray(colorLoc);
-      gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+          gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
+          gl.enableVertexAttribArray(colorLoc);
+          gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
-      gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+          gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
 
-      gl.disable(gl.CULL_FACE);
-    } else {
-      // Draw other objects normally
-      gl.disable(gl.CULL_FACE);
-      gl.enableVertexAttribArray(colorLoc);
+          gl.disable(gl.CULL_FACE);
+        } else {
+          // Draw other objects normally
+          gl.disable(gl.CULL_FACE);
+          gl.enableVertexAttribArray(colorLoc);
 
-      gl.uniformMatrix4fv(uMTM, false, transformMatrix);
+          gl.uniformMatrix4fv(uMTM, false, transformMatrix);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+          gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
+          gl.enableVertexAttribArray(posLoc);
+          gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
-      gl.enableVertexAttribArray(colorLoc);
-      gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+          gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
+          gl.enableVertexAttribArray(colorLoc);
+          gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
-      gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+          gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+        }
+      }
     }
-  }
-}
 
     // Initialize when page loads
     window.onload = function () {
