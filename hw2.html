@@ -61,6 +61,11 @@
       </div>
 
       <button id="primitive-insert" onclick="createShape();">Add To Scene</button>
+      <div>
+        <button id="rotate-button" onclick="setMode('rotate')">Rotate</button>
+        <button id="translate-button" onclick="setMode('translate')">Translate</button>
+        <button id="scale-button" onclick="setMode('scale')">Scale</button>
+      </div>
     </div>
   </div>
 
@@ -147,9 +152,13 @@ void main() {
     let selectedObject = null;
     let selectedObjectIndex = null;
     let curId = 0;
+    let mode = "rotate";
     function getNewId() {
       curId++;//makes sure this id is always unique
       return curId;
+    }
+    function setMode(modeName) {
+      mode = modeName;
     }
 
     function initBuffer(positions, colors, indices) {
@@ -261,12 +270,14 @@ void main() {
     canvas.addEventListener('mouseup', () => mouseDown = false);
     canvas.addEventListener('mousemove', e => {
       if (!mouseDown) return;
-      if(!selectedObject) return;
+      if (!selectedObject) return;
+      if(mode == "rotate") {
       let dx = e.clientX - lastX;
       let dy = e.clientY - lastY;
       selectedObject.rotY += dx * 0.01;
       selectedObject.rotX += dy * 0.01;
       lastX = e.clientX; lastY = e.clientY;
+      }
     });
 
     document.addEventListener('keydown', e => {
