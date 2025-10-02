@@ -90,24 +90,3 @@ function mat4Scale(m, s) {
   result[10] *= s[2];
   return result;
 }
-
-  // Helper to create rotation matrix from rotX, rotY. Instead of just declaring this in the render func
-  function createRotationMatrix(rotX, rotY) {
-    let cx = Math.cos(rotY || 0), sx = Math.sin(rotY || 0);
-    let cy = Math.cos(rotX || 0), sy = Math.sin(rotX || 0);
-
-    let rotXMat = [
-      1, 0, 0, 0,
-      0, cy, sy, 0,
-      0, -sy, cy, 0,
-      0, 0, 0, 1
-    ];
-    let rotYMat = [
-      cx, 0, -sx, 0,
-      0, 1, 0, 0,
-      sx, 0, cx, 0,
-      0, 0, 0, 1
-    ];
-    return multiplyMat4(rotYMat, rotXMat);
-  }
-

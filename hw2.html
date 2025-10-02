@@ -174,7 +174,7 @@ void main() {
       let bibo = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bibo);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-      buffers.push(new buff(bvbo, bnbo, bibo, indices.length, getNewId()));
+      buffers.push(new shape(bvbo, bnbo, bibo, indices.length, getNewId()));
       rotMats.push(null);
     }
 
@@ -229,7 +229,7 @@ void main() {
 
     let pickProgram, uPickColorLoc;
 
-    //
+    //separate shader for rendering the interactible portion
     function initPickShader() {
       const vsSource = document.getElementById("vertex-shader").textContent;
       const fsSource = document.getElementById("fragment-shader-pick").textContent;
@@ -282,6 +282,10 @@ void main() {
       selectedObject.posX += dx * 0.01; 
       }
       else if(mode == "scale") {
+        let scaleDiff = -dy * 0.01;
+        selectedObject.scaY += scaleDiff;
+        selectedObject.scaX += scaleDiff;
+        selectedObject.scaZ += scaleDiff;
       }
       lastX = e.clientX; lastY = e.clientY;
     });
@@ -384,9 +388,12 @@ function render() {
 
   for (let i = 0; i < buffers.length; i++) {
     let b = buffers[i];
+    let scaleVector = b.getScaleVector();
     let rotationMatrix = b.getRotationMatrix();
     let translationMatrix = b.getTranslationMatrix();
-    let transformMatrix = multiplyMat4(translationMatrix, rotationMatrix);
+    let transformMatrix = mat4Scale(mat4Identity(), scaleVector);
+    transformMatrix = multiplyMat4(rotationMatrix, transformMatrix);
+    transformMatrix = multiplyMat4(translationMatrix, transformMatrix);
 
     if (b === selectedObject) {
       // --- Outline pass ---

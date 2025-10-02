@@ -1,6 +1,6 @@
 
-//for storing buffer objs
-class buff {
+//for storing buffer objs and individual shape data (rot, pos, scale)
+class shape {
   constructor(bvbo, bnbo, bibo, len, id) {
     this.vbo = bvbo;
     this.nbo = bnbo;
@@ -16,6 +16,9 @@ class buff {
   rotX = 0;
   rotY = 0;
   rotZ = 0;
+  scaX = 1;
+  scaY = 1;
+  scaZ = 1;
 
 
   getRotationMatrix() {
@@ -39,7 +42,7 @@ class buff {
       0, 0, 0, 1
     ];
 
-    // Rotation Z (optional)
+    // Rotation Z (optional, will come back to this (probably))
     const rotZMat = [
       cz, sz, 0, 0,
       -sz, cz, 0, 0,
@@ -47,11 +50,14 @@ class buff {
       0, 0, 0, 1
     ];
 
-    // Combine Y * X * Z (order matters!)
+    // Combine Y * X * Z (order matters)
     return multiplyMat4(multiplyMat4(rotYMat, rotXMat), rotZMat);
   }
   getTranslationMatrix() {
     return mat4Translate(mat4Identity(), [this.posX, this.posY, this.posZ]);
+  }
+  getScaleVector() {
+    return [this.scaX, this.scaY, this.scaZ];
   }
 
 }
@@ -64,10 +70,6 @@ function idToColor(id) {
 }
 function colorToId([r, g, b]) {
   return r + (g << 8) + (b << 16);
-}
-//primitive type
-//storing shape data
-class shape {
 }
 
 // cube
