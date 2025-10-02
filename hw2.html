@@ -48,6 +48,9 @@
       <canvas id="glcanvas" width="400" height="400"></canvas>
     </div>
     <div>
+    <div>
+      <p>Click on a shape in the scene to manipulate it!</p>
+    </div>
       <div><label for="primitive">Choose a shape:</label>
 
         <select name="primitive" id="primitiveName">
@@ -62,6 +65,7 @@
 
       <button id="primitive-insert" onclick="createShape();">Add To Scene</button>
       <div>
+        <p>Choose Transform Type</p>
         <button id="rotate-button" onclick="setMode('rotate')">Rotate</button>
         <button id="translate-button" onclick="setMode('translate')">Translate</button>
         <button id="scale-button" onclick="setMode('scale')">Scale</button>
@@ -197,19 +201,13 @@ void main() {
 
     function initAllBuffers() {
       buffers = [];
-      // let cylinder = createCylinder();
-      // initBuffer(cylinder.positions, cylinder.colors, cylinder.indices);
-      // let tet = createTetrahedron();
-      // initBuffer(tet.positions, tet.colors, tet.indices);
-      let cube = createCube();
-      initBuffer(cube.positions, cube.colors, cube.indices);
-      // let sphere = createSphere();
-      // initBuffer(sphere.positions, sphere.colors, sphere.indices);
-      // let cone = createCone();
-      // initBuffer(cone.positions, cone.colors, cone.indices);
-      // let torus = createTorus();
-      // initBuffer(torus.positions, torus.colors, torus.indices);
-      console.log(buffers);
+      //createShape("Cube");
+      createShape("Tetrahedron");
+      // createShape("Cylinder");
+      // createShape("Cylinder");
+      // createShape("Cone");
+      // createShape("Sphere");
+      // createShape("Torus");
     }
     initAllBuffers();
 
