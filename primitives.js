@@ -1,12 +1,25 @@
 
 //for storing buffer objs
 class buff {
-  constructor(bvbo, bnbo, bibo, len) {
+  constructor(bvbo, bnbo, bibo, len, id) {
     this.vbo = bvbo;
     this.nbo = bnbo;
     this.ibo = bibo;
     this.length = len;
+    this.id = id;
+    this.pickColor = idToColor(id); //this is just id encoded as a color for the onclick event
+    //redudancy makes it so the conversion has to happen less frequently. Not that this is computationally intensive lol
   }
+}
+function idToColor(id) {
+  return [
+    (id & 0xFF) / 255,
+    ((id >> 8) & 0xFF) / 255,
+    ((id >> 16) & 0xFF) / 255
+  ];
+}
+function colorToId([r, g, b]) {
+  return r + (g << 8) + (b << 16);
 }
 //primitive type
 //storing shape data

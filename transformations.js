@@ -82,3 +82,12 @@ function multiplyMat4(a, b) {
     return r;
 }
 
+function mat4Scale(m, s) {
+  let result = new Float32Array(16);
+  result.set(m);
+  result[0] *= s[0];
+  result[5] *= s[1];
+  result[10] *= s[2];
+  return result;
+}
+

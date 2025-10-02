@@ -90,6 +90,15 @@ void main() {
   fragColor = vec4(vColor,1.0);
 }
 </script>
+  <!--Object picker by color. Does not show in the GUI for editing the shaders-->
+  <script id="fragment-shader-pick" type="x-shader/x-fragment">#version 300 es
+precision mediump float;
+uniform vec3 uPickColor;
+out vec4 fragColor;
+void main() {
+  fragColor = vec4(uPickColor, 1.0);
+}
+</script>
 
   <script src="primitives.js"></script>
   <script src="transformations.js"></script>
@@ -131,8 +140,14 @@ void main() {
     let program, posLoc, colorLoc, uMVM, uPM, uMTM;
     let tetvbo, tetnbo, tetibo;
     let buffers = [];
+    let curId = 0;
+    function getNewId() {
+      curId++;//makes sure this id is always unique
+      return curId;
+    }
 
     function initBuffer(positions, colors, indices) {
+
       let bvbo = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, bvbo);
       gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
@@ -144,7 +159,7 @@ void main() {
       let bibo = gl.createBuffer();
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bibo);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-      buffers.push(new buff(bvbo, bnbo, bibo, indices.length));
+      buffers.push(new buff(bvbo, bnbo, bibo, indices.length, getNewId()));
     }
 
 
@@ -152,8 +167,8 @@ void main() {
       buffers = [];
       let cylinder = createCylinder();
       initBuffer(cylinder.positions, cylinder.colors, cylinder.indices);
-      // let tet = createTetrahedron();
-      // initBuffer(tet.positions, tet.colors, tet.indices);
+      let tet = createTetrahedron();
+      initBuffer(tet.positions, tet.colors, tet.indices);
       //let cube = createCube();
       //initBuffer(cube.positions, cube.colors, cube.indices);
       // let sphere = createSphere();
@@ -179,6 +194,39 @@ void main() {
       } catch (e) { console.error(e); }
     }
     initShaderProgram();
+
+    let pickProgram, uPickColorLoc;
+
+    //
+    function initPickShader() {
+      const vsSource = document.getElementById("vertex-shader").textContent;
+      const fsSource = document.getElementById("fragment-shader-pick").textContent;
+
+      pickProgram = createProgram(gl, vsSource, fsSource);
+      uPickColorLoc = gl.getUniformLocation(pickProgram, "uPickColor");
+      uPickPM = gl.getUniformLocation(pickProgram, "uProjectionMatrix");
+      uPickMVM = gl.getUniformLocation(pickProgram, "uModelViewMatrix");
+      uPickMTM = gl.getUniformLocation(pickProgram, "uModelTransformationMatrix"); // if needed
+    }
+    initPickShader();
+
+    //define + initialize the frame buffs for picking objects by color
+    let pickFramebuffer = gl.createFramebuffer();
+    let pickTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, pickTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    let depthBuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, canvas.width, canvas.height);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, pickFramebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickTexture, 0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
     vertEditor.onkeyup = initShaderProgram;
     fragEditor.onkeyup = initShaderProgram;
 
@@ -209,17 +257,84 @@ void main() {
       }
     });
 
+    let proj;
+    let modelViewMatrix;
+    let modelTransformationMatrix;
+    let cubeRotation;
 
     let fov = Math.PI / 4, aspect = canvas.width / canvas.height, zNear = 0.1, zFar = 100;
     let f = 1 / Math.tan(fov / 2);
-    let proj = new Float32Array([
-      f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (zFar + zNear) / (zNear - zFar), -1, 0, 0, (2 * zFar * zNear) / (zNear - zFar), 0
+    proj = new Float32Array([
+      f / aspect, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (zFar + zNear) / (zNear - zFar), -1,
+      0, 0, (2 * zFar * zNear) / (zNear - zFar), 0
     ]);
+
+    function pickObjectAt(x, y) {
+      let mvMatrix = mat4Translate(mat4Identity(), [camX, camY, camZ]);
+      let rotation = multiplyMat4(
+        [Math.cos(cubeRotY), 0, -Math.sin(cubeRotY), 0,
+          0, 1, 0, 0,
+        Math.sin(cubeRotY), 0, Math.cos(cubeRotY), 0,
+          0, 0, 0, 1],
+        [1, 0, 0, 0,
+          0, Math.cos(cubeRotX), Math.sin(cubeRotX), 0,
+          0, -Math.sin(cubeRotX), Math.cos(cubeRotX), 0,
+          0, 0, 0, 1]
+      );
+      let mtMatrix = rotation;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, pickFramebuffer);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+      gl.useProgram(pickProgram);
+
+      gl.useProgram(pickProgram);
+      gl.uniformMatrix4fv(uPickPM, false, proj);
+      gl.uniformMatrix4fv(uPickMVM, false, mvMatrix);
+      gl.uniformMatrix4fv(uPickMTM, false, mtMatrix);
+
+      for (let i = 0; i < buffers.length; i++) {
+        const b = buffers[i];
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+
+        gl.uniform3fv(uPickColorLoc, b.pickColor);
+
+        gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+      }
+
+      let pixels = new Uint8Array(4);
+      gl.readPixels(x, canvas.height - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+      let pickedId = colorToId(pixels);
+      return pickedId;
+    }
+    let selectedObject = null;
+
+    //mouse interaction for selecting objects
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const pickedId = pickObjectAt(mouseX, mouseY);
+
+      selectedObject = buffers.find(obj => obj.id === pickedId) || null;
+      console.log("Picked object:", selectedObject ? selectedObject.id : "none");
+    });
+
 
     let startTime = Date.now();
 
     function render() {
-
+      gl.useProgram(program)
       gl.enable(gl.DEPTH_TEST);
       gl.clearColor(0, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -232,9 +347,9 @@ void main() {
       let cubeRotation = multiplyMat4(rotY, rotX);
 
       // init model-view matrix as identity matrix
-      let modelViewMatrix = mat4Identity();
+      modelViewMatrix = mat4Identity();
       // init model transformation matrix as identity matrix
-      let modelTransformationMatrix = mat4Identity();
+      modelTransformationMatrix = mat4Identity();
 
       //delta time in ms
       let deltaTime = Date.now() - startTime;
@@ -261,6 +376,14 @@ void main() {
         gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+
+        let objTransform = mat4Identity();
+        if (b === selectedObject) {
+          objTransform = mat4Scale(objTransform, [1.2, 1.2, 1.2]); // scale selected shape
+        }
+
+        objTransform = multiplyMat4(objTransform, cubeRotation);
+        gl.uniformMatrix4fv(uMTM, false, objTransform);
 
         // draw the object by the index order
         gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
