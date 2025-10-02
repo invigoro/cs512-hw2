@@ -329,14 +329,8 @@ void main() {
       for (let i = 0; i < buffers.length; i++) {
         const b = buffers[i];
 
-        let cx = Math.cos(b.rotY || 0), sx = Math.sin(b.rotY || 0);
-        let cy = Math.cos(b.rotX || 0), sy = Math.sin(b.rotX || 0);
-
-        let rotX = [1, 0, 0, 0, 0, cy, sy, 0, 0, -sy, cy, 0, 0, 0, 0, 1];
-        let rotY = [cx, 0, -sx, 0, 0, 1, 0, 0, sx, 0, cx, 0, 0, 0, 0, 1];
-        let mtMatrix = multiplyMat4(rotY, rotX);
-
-        gl.uniformMatrix4fv(uPickMTM, false, mtMatrix);
+let transformMatrix = b.getFullTransformMatrix(b);
+gl.uniformMatrix4fv(uPickMTM, false, transformMatrix);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
         gl.enableVertexAttribArray(posLoc);
@@ -387,16 +381,11 @@ void main() {
 
       for (let i = 0; i < buffers.length; i++) {
         let b = buffers[i];
-        let scaleVector = b.getScaleVector();
-        let rotationMatrix = b.getRotationMatrix();
-        let translationMatrix = b.getTranslationMatrix();
-        let transformMatrix = mat4Scale(mat4Identity(), scaleVector);
-        transformMatrix = multiplyMat4(rotationMatrix, transformMatrix);
-        transformMatrix = multiplyMat4(translationMatrix, transformMatrix);
+        let transformMatrix = b.getFullTransformMatrix();
 
         if (b === selectedObject) {
           // For selected object — render normally (for now)
-          gl.disable(gl.CULL_FACE); // optional
+          gl.disable(gl.CULL_FACE); 
 
           gl.uniformMatrix4fv(uMTM, false, transformMatrix);
 

@@ -60,6 +60,17 @@ class shape {
     return [this.scaX, this.scaY, this.scaZ];
   }
 
+  getFullTransformMatrix() {
+  let scaleVector = this.getScaleVector();
+  let rotationMatrix = this.getRotationMatrix();
+  let translationMatrix = this.getTranslationMatrix();
+
+  let transformMatrix = mat4Scale(mat4Identity(), scaleVector);
+  transformMatrix = multiplyMat4(rotationMatrix, transformMatrix);
+  transformMatrix = multiplyMat4(translationMatrix, transformMatrix);
+  return transformMatrix;
+}
+
 }
 function idToColor(id) {
   return [
