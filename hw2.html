@@ -50,15 +50,17 @@
     <div>
       <div><label for="primitive">Choose a shape:</label>
 
-        <select name="primitive" id="primitive">
+        <select name="primitive" id="primitiveName">
           <option value="Cube">Cube</option>
           <option value="Tetrahedron">Tetrahedron</option>
+          <option value="Cone">Cone</option>
           <option value="Cylinder">Cylinder</option>
           <option value="Sphere">Sphere</option>
+          <option value="Torus">Torus</option>
         </select>
       </div>
 
-      <button id="primitive-insert">Add To Scene</button>
+      <button id="primitive-insert" onclick="createShape();">Add To Scene</button>
     </div>
   </div>
 
@@ -162,6 +164,21 @@ void main() {
       buffers.push(new buff(bvbo, bnbo, bibo, indices.length, getNewId()));
     }
 
+    function createShape(shapeName = null) {
+      if(shapeName == null) {
+        shapeName = document.getElementById("primitiveName").value;
+      }
+      let shape = null;
+      switch(shapeName) {
+        case "Cube": shape = createCube();
+        case "Cylinder": shape = createCylinder();
+        case "Tetrahedron": shape = createTetrahedron();
+        case "Cone": shape = createCone();
+        case "Torus": shape = createTorus();
+        case "Sphere": shape = createSphere();
+      }
+      initBuffer(shape.positions, shape.colors, shape.indices);
+    }
 
     function initAllBuffers() {
       buffers = [];
