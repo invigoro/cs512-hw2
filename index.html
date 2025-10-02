@@ -48,9 +48,9 @@
       <canvas id="glcanvas" width="400" height="400"></canvas>
     </div>
     <div>
-    <div>
-      <p>Click on a shape in the scene to manipulate it!</p>
-    </div>
+      <div>
+        <p>Click on a shape in the scene to manipulate it!</p>
+      </div>
       <div><label for="primitive">Choose a shape:</label>
 
         <select name="primitive" id="primitiveName">
@@ -375,8 +375,8 @@ void main() {
       gl.useProgram(program);
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clearDepth(1.0);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);
-gl.depthFunc(gl.LESS);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); gl.enable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.LESS);
 
       // Set projection matrix uniform once
       gl.uniformMatrix4fv(uPM, false, proj);
@@ -395,22 +395,22 @@ gl.depthFunc(gl.LESS);
         transformMatrix = multiplyMat4(translationMatrix, transformMatrix);
 
         if (b === selectedObject) {
-  // For selected object — render normally (for now)
-  gl.disable(gl.CULL_FACE); // optional
+          // For selected object — render normally (for now)
+          gl.disable(gl.CULL_FACE); // optional
 
-  gl.uniformMatrix4fv(uMTM, false, transformMatrix);
+          gl.uniformMatrix4fv(uMTM, false, transformMatrix);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
-  gl.enableVertexAttribArray(posLoc);
-  gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+          gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
+          gl.enableVertexAttribArray(posLoc);
+          gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
-  gl.enableVertexAttribArray(colorLoc);
-  gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+          gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
+          gl.enableVertexAttribArray(colorLoc);
+          gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
 
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
-  gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
-} else {
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+          gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+        } else {
           // Draw other objects normally
           gl.disable(gl.CULL_FACE);
           gl.enableVertexAttribArray(colorLoc);
