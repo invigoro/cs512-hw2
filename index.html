@@ -375,7 +375,8 @@ void main() {
       gl.useProgram(program);
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clearDepth(1.0);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);
+gl.depthFunc(gl.LESS);
 
       // Set projection matrix uniform once
       gl.uniformMatrix4fv(uPM, false, proj);
@@ -394,47 +395,22 @@ void main() {
         transformMatrix = multiplyMat4(translationMatrix, transformMatrix);
 
         if (b === selectedObject) {
-          // --- Outline pass ---
-          let outlineScale = 1.05;
-          let outlineTransform = mat4Scale(transformMatrix, [outlineScale, outlineScale, outlineScale]);
+  // For selected object — render normally (for now)
+  gl.disable(gl.CULL_FACE); // optional
 
-          gl.enable(gl.CULL_FACE);
-          gl.cullFace(gl.FRONT);
-          gl.frontFace(gl.CW);
+  gl.uniformMatrix4fv(uMTM, false, transformMatrix);
 
-          // red color for outline
-          gl.disableVertexAttribArray(colorLoc);
-          gl.vertexAttrib3f(colorLoc, 1.0, 0.0, 0.0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
+  gl.enableVertexAttribArray(posLoc);
+  gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
 
-          gl.uniformMatrix4fv(uMTM, false, outlineTransform);
+  gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
+  gl.enableVertexAttribArray(colorLoc);
+  gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
 
-          gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
-          gl.enableVertexAttribArray(posLoc);
-          gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
-
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
-          gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
-
-          // --- Normal object pass ---
-          gl.frontFace(gl.CCW);
-          gl.cullFace(gl.BACK);
-          gl.enableVertexAttribArray(colorLoc);
-
-          gl.uniformMatrix4fv(uMTM, false, transformMatrix);
-
-          gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
-          gl.enableVertexAttribArray(posLoc);
-          gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
-
-          gl.bindBuffer(gl.ARRAY_BUFFER, b.nbo);
-          gl.enableVertexAttribArray(colorLoc);
-          gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
-
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
-          gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
-
-          gl.disable(gl.CULL_FACE);
-        } else {
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
+  gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
+} else {
           // Draw other objects normally
           gl.disable(gl.CULL_FACE);
           gl.enableVertexAttribArray(colorLoc);
