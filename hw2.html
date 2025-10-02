@@ -271,13 +271,19 @@ void main() {
     canvas.addEventListener('mousemove', e => {
       if (!mouseDown) return;
       if (!selectedObject) return;
-      if(mode == "rotate") {
       let dx = e.clientX - lastX;
       let dy = e.clientY - lastY;
+      if(mode == "rotate") {
       selectedObject.rotY += dx * 0.01;
       selectedObject.rotX += dy * 0.01;
-      lastX = e.clientX; lastY = e.clientY;
       }
+      else if(mode == "translate") {
+      selectedObject.posY += -dy * 0.01; //invert since y counts from the top
+      selectedObject.posX += dx * 0.01; 
+      }
+      else if(mode == "scale") {
+      }
+      lastX = e.clientX; lastY = e.clientY;
     });
 
     document.addEventListener('keydown', e => {
@@ -376,34 +382,16 @@ function render() {
   let modelViewMatrix = mat4Translate(mat4Identity(), [camX, camY, camZ]);
   gl.uniformMatrix4fv(uMVM, false, modelViewMatrix);
 
-  // Helper to create rotation matrix from rotX, rotY
-  function createRotationMatrix(rotX, rotY) {
-    let cx = Math.cos(rotY || 0), sx = Math.sin(rotY || 0);
-    let cy = Math.cos(rotX || 0), sy = Math.sin(rotX || 0);
-
-    let rotXMat = [
-      1, 0, 0, 0,
-      0, cy, sy, 0,
-      0, -sy, cy, 0,
-      0, 0, 0, 1
-    ];
-    let rotYMat = [
-      cx, 0, -sx, 0,
-      0, 1, 0, 0,
-      sx, 0, cx, 0,
-      0, 0, 0, 1
-    ];
-    return multiplyMat4(rotYMat, rotXMat);
-  }
-
   for (let i = 0; i < buffers.length; i++) {
     let b = buffers[i];
-    let rotationMatrix = createRotationMatrix(b.rotX, b.rotY);
+    let rotationMatrix = b.getRotationMatrix();
+    let translationMatrix = b.getTranslationMatrix();
+    let transformMatrix = multiplyMat4(translationMatrix, rotationMatrix);
 
     if (b === selectedObject) {
       // --- Outline pass ---
       let outlineScale = 1.05;
-      let outlineTransform = mat4Scale(rotationMatrix, [outlineScale, outlineScale, outlineScale]);
+      let outlineTransform = mat4Scale(transformMatrix, [outlineScale, outlineScale, outlineScale]);
 
       gl.enable(gl.CULL_FACE);
       gl.cullFace(gl.FRONT);
@@ -427,7 +415,7 @@ function render() {
       gl.cullFace(gl.BACK);
       gl.enableVertexAttribArray(colorLoc);
 
-      gl.uniformMatrix4fv(uMTM, false, rotationMatrix);
+      gl.uniformMatrix4fv(uMTM, false, transformMatrix);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
       gl.enableVertexAttribArray(posLoc);
@@ -446,7 +434,7 @@ function render() {
       gl.disable(gl.CULL_FACE);
       gl.enableVertexAttribArray(colorLoc);
 
-      gl.uniformMatrix4fv(uMTM, false, rotationMatrix);
+      gl.uniformMatrix4fv(uMTM, false, transformMatrix);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
       gl.enableVertexAttribArray(posLoc);
