@@ -201,8 +201,8 @@ void main() {
       // initBuffer(cylinder.positions, cylinder.colors, cylinder.indices);
       // let tet = createTetrahedron();
       // initBuffer(tet.positions, tet.colors, tet.indices);
-      //let cube = createCube();
-      //initBuffer(cube.positions, cube.colors, cube.indices);
+      let cube = createCube();
+      initBuffer(cube.positions, cube.colors, cube.indices);
       // let sphere = createSphere();
       // initBuffer(sphere.positions, sphere.colors, sphere.indices);
       // let cone = createCone();
@@ -409,7 +409,7 @@ function render() {
       gl.cullFace(gl.FRONT);
       gl.frontFace(gl.CW);
 
-      // Use constant red color for outline
+      // red color for outline
       gl.disableVertexAttribArray(colorLoc);
       gl.vertexAttrib3f(colorLoc, 1.0, 0.0, 0.0);
 
