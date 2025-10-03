@@ -94,11 +94,12 @@ void main() {
   <script id="fragment-shader" type="x-shader/x-fragment">#version 300 es
 precision mediump float;
 in vec3 vColor;
+uniform float uOpacity; 
 
 out vec4 fragColor;
 
 void main() {
-  fragColor = vec4(vColor,1.0);
+  fragColor = vec4(vColor, uOpacity);
 }
 </script>
   <!--Object picker by color. Does not show in the GUI for editing the shaders-->
@@ -148,7 +149,7 @@ void main() {
     vertEditor.value = document.getElementById("vertex-shader").textContent;
     fragEditor.value = document.getElementById("fragment-shader").textContent;
 
-    let program, posLoc, colorLoc, uMVM, uPM, uMTM;
+    let program, posLoc, colorLoc, uMVM, uPM, uMTM, uOpacityLoc;
     let tetvbo, tetnbo, tetibo;
     let buffers = [];
     let rotMats = [];
@@ -218,6 +219,7 @@ void main() {
         posLoc = gl.getAttribLocation(program, "aPosition");
         colorLoc = gl.getAttribLocation(program, "aColor");
         timeLoc = gl.getUniformLocation(program, "uTime");
+        uOpacityLoc = gl.getUniformLocation(program, "uOpacity");
         uMVM = gl.getUniformLocation(program, "uModelViewMatrix");
         uPM = gl.getUniformLocation(program, "uProjectionMatrix");
         uMTM = gl.getUniformLocation(program, "uModelTransformationMatrix");
@@ -329,8 +331,8 @@ void main() {
       for (let i = 0; i < buffers.length; i++) {
         const b = buffers[i];
 
-let transformMatrix = b.getFullTransformMatrix(b);
-gl.uniformMatrix4fv(uPickMTM, false, transformMatrix);
+        let transformMatrix = b.getFullTransformMatrix(b);
+        gl.uniformMatrix4fv(uPickMTM, false, transformMatrix);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, b.vbo);
         gl.enableVertexAttribArray(posLoc);
@@ -369,23 +371,32 @@ gl.uniformMatrix4fv(uPickMTM, false, transformMatrix);
       gl.useProgram(program);
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clearDepth(1.0);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); gl.enable(gl.DEPTH_TEST);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 
+      gl.enable(gl.DEPTH_TEST);
       gl.depthFunc(gl.LESS);
 
-      // Set projection matrix uniform once
+      //for the opacity stuff
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+      // Set projection matrix uniform once. ain't need it for all
       gl.uniformMatrix4fv(uPM, false, proj);
 
       // Camera transform (modelViewMatrix)
       let modelViewMatrix = mat4Translate(mat4Identity(), [camX, camY, camZ]);
       gl.uniformMatrix4fv(uMVM, false, modelViewMatrix);
 
+      let time = (Date.now() - startTime) / 1000;  // seconds
+      //for selected obj
+      let pulseOpacity = 0.75 + 0.25 * Math.sin(time * 5);
+
       for (let i = 0; i < buffers.length; i++) {
         let b = buffers[i];
         let transformMatrix = b.getFullTransformMatrix();
 
-        if (b === selectedObject) {
-          // For selected object — render normally (for now)
-          gl.disable(gl.CULL_FACE); 
+        if (b === selectedObject) { //only does this for the ONE selected obj
+          gl.disable(gl.CULL_FACE);
+          gl.uniform1f(uOpacityLoc, pulseOpacity);
 
           gl.uniformMatrix4fv(uMTM, false, transformMatrix);
 
@@ -400,7 +411,8 @@ gl.uniformMatrix4fv(uPickMTM, false, transformMatrix);
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, b.ibo);
           gl.drawElements(gl.TRIANGLES, b.length, gl.UNSIGNED_SHORT, 0);
         } else {
-          // Draw other objects normally
+          // Draw other objects normally NOT WITH THAT OPACITY NONSENSE 
+          gl.uniform1f(uOpacityLoc, 1.0);
           gl.disable(gl.CULL_FACE);
           gl.enableVertexAttribArray(colorLoc);
 
